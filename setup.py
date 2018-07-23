@@ -24,7 +24,7 @@ with open('requirements.txt') as requirements, \
                 'supervisor_elastic = supervisor_elastic:main',
             ],
         },
-        install_requirements=requirements.read().splitlines(),
+        install_requires=requirements.read().splitlines(),
         test_suite='tests',
-        tests_require=test_requirements.read().splitlines(),
+        tests_requires=test_requirements.read().splitlines(),
     )
