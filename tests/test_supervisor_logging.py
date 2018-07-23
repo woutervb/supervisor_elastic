@@ -12,6 +12,25 @@ from time import sleep
 
 from unittest import TestCase
 
+def strip_volatile(message):
+    """
+    Strip volatile parts (PID, datetime) from a logging message.
+    """
+
+    volatile = ((
+        '^\*\d\\\r\\\n\$\d\\\r\\\n\PUBLISH\\\r\\\n\$\d\\\r\\\npython\\\r\\\n\$\d+\\\r\\\n',
+        ''),
+        (r'"thread": \d+', '"thread": 0'),
+        (r'"created": \d+\.\d+', '"created": "now"'),
+        (r'"relativeCreated": \d+\.\d+', '"relativeCreated": "now"'),
+        (r'"msecs": \d+\.\d+', '"msecs": "now"'),
+        (r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z', 'DATE'),
+    )
+
+    for regexp, replacement in volatile:
+        message = re.sub(regexp, replacement, message)
+
+    return message
 
 
 class SupervisorLoggingTestCase(TestCase):
@@ -63,11 +82,11 @@ class SupervisorLoggingTestCase(TestCase):
 
                 sleep(8)
 
-                self.assertEqual(messages,
+                self.assertEqual(list(map(strip_volatile, messages)),
                     [
-                        u'*3\r\n$7\r\nPUBLISH\r\n$6\r\npython\r\n$45\r\n'
-                        u'<LogRecord: messages, 20, None, 0, "Test {i}\n">'.
-                        format(pid=pid, i=i) for i in range(4)
+                        u'{"relativeCreated": "now", '
+                        u'"process": %s, "@timestamp": "DATE", "module": '
+                        u'"supervisor_elastic", "funcName": null, "message": "Test %s\\n", "name": "messages", "thread": 0, "created": "now", "threadName": "MainThread", "msecs": "now", "filename": null, "levelno": 20, "processName": "MainProcess", "source_host": "", "pathname": null, "lineno": 0, "@version": 1, "levelname": "INFO"}' % (pid, i//2) for i in range(8)
                     ])
             finally:
                 supervisor.terminate()
