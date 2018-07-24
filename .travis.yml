@@ -6,7 +6,7 @@ env:
 install:
     - pip install -e .
     - pip install -e .[test]
-    - pip install supervisor
+    - ./install_supervisor.sh
 script:
     - python -m unittest discover
 sudo: false
