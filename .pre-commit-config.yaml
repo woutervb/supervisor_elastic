@@ -10,7 +10,6 @@ repos:
         - --ignore=W503
     -   id: check-merge-conflict
     -   id: double-quote-string-fixer
-    -   id: end-of-file-fixer
     -   id: name-tests-test
     -   id: check-added-large-files
     -   id: check-ast
