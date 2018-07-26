@@ -37,7 +37,7 @@ class RedisFormatter(logging.Formatter):
         else:
             try:
                 self.source_host = socket.gethostbyname()
-            except:
+            except Exception:
                 self.source_host = ''
 
     def format(self, record):
@@ -46,7 +46,7 @@ class RedisFormatter(logging.Formatter):
         if isinstance(record.msg, dict):
             fields.update(record.msg)
             fields.pop('msg')
-            msg = ""
+            msg = ''
         else:
             msg = record.getMessage()
 
@@ -71,8 +71,8 @@ class RedisFormatter(logging.Formatter):
         now = datetime.datetime.utcnow()
         base_log = {
             '@timestamp':
-            now.strftime("%Y-%m-%dT%H:%M:%S") +
-            ".%03d" % (now.microsecond / 1000) + "Z",
+            now.strftime('%Y-%m-%dT%H:%M:%S') +
+            '.%03d' % (now.microsecond / 1000) + 'Z',
             '@version':
             1,
             'source_host':
@@ -125,7 +125,7 @@ def supervisor_events(stdin, stdout):
 
         payload = stdin.read(int(headers['len']))
         event_headers, event_data = eventdata(payload)
-        
+
         yield event_headers, event_data
 
         stdout.write('RESULT 2\nOK')

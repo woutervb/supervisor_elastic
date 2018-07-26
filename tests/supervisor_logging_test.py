@@ -1,25 +1,24 @@
 import os
 import re
-import socket
+import subprocess
+import threading
+from time import sleep
+from unittest import TestCase
+
 try:
     import socketserver
 except ImportError:
     import SocketServer as socketserver
-import subprocess
-import threading
 
-from time import sleep
-
-from unittest import TestCase
 
 def strip_volatile(message):
     """
     Strip volatile parts (PID, datetime) from a logging message.
     """
 
-    volatile = ((
-        '^\*\d\\\r\\\n\$\d\\\r\\\n\PUBLISH\\\r\\\n\$\d\\\r\\\npython\\\r\\\n\$\d+\\\r\\\n',
-        ''),
+    volatile = (
+        ('^\*\d\\\r\\\n\$\d\\\r\\\n\PUBLISH\\\r\\\n\$\d\\\r\\\npython\\\r'
+         '\\\n\$\d+\\\r\\\n', ''),
         (r'"thread": \d+', '"thread": 0'),
         (r'"created": \d+\.\d+', '"created": "now"'),
         (r'"relativeCreated": \d+\.\d+', '"relativeCreated": "now"'),
@@ -62,7 +61,7 @@ class SupervisorLoggingTestCase(TestCase):
             env = os.environ.copy()
             env['REDIS_LOG_URI'] = 'redis://%s:%s' % \
                                    (redis_srv.server_address[0],
-                                              redis_srv.server_address[1])
+                                    redis_srv.server_address[1])
             print(env['REDIS_LOG_URI'])
             env['REDIS_LOG_CHANNEL'] = 'python'
 
@@ -82,11 +81,19 @@ class SupervisorLoggingTestCase(TestCase):
 
                 sleep(8)
 
-                self.assertEqual(list(map(strip_volatile, messages)),
-                    [
+                self.assertEqual(
+                    list(map(strip_volatile, messages)), [
                         u'{"relativeCreated": "now", '
-                        u'"process": %s, "@timestamp": "DATE", "module": '
-                        u'"supervisor_elastic", "funcName": null, "message": "Test %s\\n", "name": "messages", "thread": 0, "created": "now", "threadName": "MainThread", "msecs": "now", "filename": null, "levelno": 20, "processName": "MainProcess", "source_host": "", "pathname": null, "lineno": 0, "@version": 1, "levelname": "INFO"}' % (pid, i//2) for i in range(8)
+                        u'"process": %s, "@timestamp": "DATE", '
+                        u'"module": "supervisor_elastic", '
+                        u'"funcName": null, "message": "Test %s\\n", '
+                        u'"name": "messages", "thread": 0, '
+                        u'"created": "now", "threadName": "MainThread", '
+                        u'"msecs": "now", "filename": null, "levelno": 20, '
+                        u'"processName": "MainProcess", "source_host": "", '
+                        u'"pathname": null, "lineno": 0, "@version": 1, '
+                        u'"levelname": "INFO"}' % (pid, i // 2)
+                        for i in range(8)
                     ])
             finally:
                 supervisor.terminate()

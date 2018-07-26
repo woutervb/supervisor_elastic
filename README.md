@@ -1,3 +1,7 @@
+Status
+======
+[![Build Status](https://travis-ci.org/woutervb/supervisor_elastic.png)](https://travis-ci.org/woutervb/supervisor_elastic)
+
 Introduction
 ============
 
@@ -60,3 +64,8 @@ And the equivalent section in logstash would be:
 
 Things that should be equal, is at least the key (in logstash) that should be equal to REDIS_LOG_CHANNEL in the supervisor
 configuration.
+
+Notice
+======
+
+Parts of this project are inspired from: https://github.com/infoxchange/supervisor-logging, so they should be mentioned.

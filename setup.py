@@ -1,7 +1,8 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
-with open('requirements.txt') as requirements, \
-        open('test-requirements.txt') as test_requirements:
+test_requirements = open('test-requirements.txt').read().splitlines()
+
+with open('requirements.txt') as requirements:
     setup(
         name='supervisor-elastic',
         version='0.0.1',
@@ -25,6 +26,9 @@ with open('requirements.txt') as requirements, \
             ],
         },
         install_requires=requirements.read().splitlines(),
+        tests_require=test_requirements,
         test_suite='tests',
-        tests_require=test_requirements.read().splitlines(),
+        extras_require={
+            'tests': test_requirements,
+        },
     )

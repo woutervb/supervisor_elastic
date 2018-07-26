@@ -3,6 +3,6 @@
 
 for i in {0..3}
 do
-	echo Test $i
-	sleep 2
+    echo Test $i
+    sleep 2
 done
